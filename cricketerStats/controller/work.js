@@ -57,6 +57,25 @@ const cricAllq= asyncWrap(async (req,res,next)=>{
             const fieldsList=fields.split(',').join(' ');
             result=result.select(fieldsList);
         }
+        const query1={...req.query};
+        if (query1.id){
+            query1._id=query>id;
+            delete query1._id;
+        }
+        if (query1.name ){
+            query1.name={
+                $regex:query1.name,
+                $options:'i'
+            };
+        }
+        if (query1.country ){
+            query1.country={
+                $regex:query1.country,
+                $options:'i'
+            };
+        }
+        const cric=await work.find(query1);
+        res.status(200).json({cric,nbHits:cric.length})
         const page=Number(req.query.page)||1;
         const limit=Number(req.query.limit)||7;
         const skip=(page-1)*limit;
