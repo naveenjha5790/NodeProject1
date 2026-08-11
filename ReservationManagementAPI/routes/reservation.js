@@ -1,4 +1,4 @@
-const {auth}=require('../middleware/authentication');
+const {auth, authorizeRoles}=require('../middleware/authentication');
 const {
     getAllReservation,
     createReservation,
@@ -6,6 +6,7 @@ const {
 }=require('../controllers/reservation');
 const express=require('express');
 const router=express.Router();
-router.route('/:resourceId').get(auth,getAllReservation).post(auth,createReservation);
+router.route('/').get(auth,getAllReservation);
+router.route('/:resourceId').post(auth,authorizeRoles('User'),createReservation);
 router.route('/:id').delete(auth,deleteReservation);
 module.exports=router;

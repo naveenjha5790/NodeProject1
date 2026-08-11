@@ -1,11 +1,11 @@
 const Resource=require('../models/Resource');
+const {BadRequestError,notFoundError,Unauthenticatederror}=require('../errors');
+const {StatusCodes}=require('http-status-codes');
 const getAllResources=async (req,res)=>{
-    //res.send("All Jobs");
     const resource=await Resource.find({}).sort('-createdAt')
-    res.status(200).json({resource,count:resource.length});
+    res.status(StatusCodes.OK).json({resource,count:resource.length});
 }
 const getResource=async (req,res)=>{
-    //res.send("Get user resource")
     const {
         user:{userId},
         params:{id:resourceId}}=req
@@ -13,14 +13,14 @@ const getResource=async (req,res)=>{
         createdBy:userId
     })
     if (!resource){
-        return res.status(402).json({msg:"No resource exist with the Id you gave"})
+        throw new notFoundError("Resource with the id doesn't exist");
     }
-    res.status(200).json({resource})
+    res.status(StatusCodes.OK).json({resource})
 }
 const createResource=async (req,res)=>{
     req.body.createdBy=req.user.userId;
     const resource=await Resource.create(req.body);
-    res.status(200).json({resource})
+    res.status(StatusCodes.CREATED).json({resource})
 }
 const deleteResource=async (req,res)=>{
     const {
@@ -30,9 +30,9 @@ const deleteResource=async (req,res)=>{
         createdBy:userId
     })
     if (!resource){
-        return res.status(404).json({msg:"No job found"});
+        throw new notFoundError("Resource not found");
     }
-    res.status(200).send("Successfully deleted");
+    res.status(StatusCodes.OK).send("Successfully deleted");
 }
 const updateResource=async (req,res)=>{
     const {
@@ -51,9 +51,9 @@ const updateResource=async (req,res)=>{
                 runValidators:true
         })
         if (!resource){
-            return res.status(402).send("No job found to update")
+            throw notFoundError("Resource doesn't exist");
         }
-        res.status(200).json({resource})
+        res.status(StatusCodes.CREATED).json({resource})
     }
 
 module.exports={

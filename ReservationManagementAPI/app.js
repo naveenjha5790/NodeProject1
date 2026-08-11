@@ -4,6 +4,8 @@ const resource=require('./routes/resource');
 const reservation=require('./routes/reservation');
 const {auth,authorizeRoles}=require('./middleware/authentication');
 const express=require('express');
+const notFoundMiddleware=require('./middleware/not-found');
+const errorHandlerMiddleware=require('./middleware/error-handler');
 const app=express();
 if (!globalThis.crypto) {
   globalThis.crypto = require('node:crypto').webcrypto;
@@ -15,9 +17,11 @@ const port=process.env.PORT ||5000;
 app.get('/',(req,res)=>{
     res.send("reservation management API is running");
 })
-app.use('/api/v1/auth',auth1);
-app.use('/api/v1/resource',resource)
-app.use('/api/v1/reservation',reservation)
+app.use('/auth',auth1);
+app.use('/resources',resource)
+app.use('/reservations',reservation)
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 const start = async ()=>{
     try{
         await connectDB(process.env.MONGO_URL);

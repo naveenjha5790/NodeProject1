@@ -9,7 +9,7 @@ const reservationScehema=new mongoose.Schema({
     resourceId:{
         type:mongoose.Schema.ObjectId,
         ref:'Resource',
-        require:[true,"Resource Id is necessary to find resource"]
+        require:[true,"A valid resourceId link path is mandatory to place reservations"]
     },
     startTime:{
         type:Date,

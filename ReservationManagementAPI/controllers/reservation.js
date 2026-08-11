@@ -1,29 +1,68 @@
+const { StatusCodes } = require('http-status-codes');
 const Reservation=require('../models/reservation');
+const { BadRequestError, notFoundError } = require('../errors');
+const Resource = require('../models/Resource');
+const notFound = require('../middleware/not-found');
 
 
 
 const getAllReservation=async (req,res)=>{
-    const {userId}=req.user;
-    const reservation=await Reservation.find({userId});
-    res.status(200).json({reservation,cont:reservation.length})
+  const {userId,role}=req.user;
+    let query={};
+    if (role!== 'Admin'){
+        query.userId=userId;
+    }
+    const reservation=await Reservation.find(query)
+    .sort('-createdAt')
+    .populate('resourceId','name resourceType location');
+    res.status(StatusCodes.OK).json({
+        role,
+        count:reservation.length,
+        reservation
+    });
 };
 const createReservation= async (req,res)=>{
     req.body.userId=req.user.userId;
-    req.body.resourceId=req.params.resourceId;
+    const {resourceId}=req.params;
+    req.body.resourceId = resourceId; 
+    const exists=await Resource.findById(resourceId);
+    if (!exists){
+        throw new notFoundError("The resource with given id doesn't exist");
+    }
+    const {startTime,endTime}=req.body;
+    const overlap= await Reservation.findOne({
+        resourceId,
+        status:{$ne:'Cancelled'},
+        $or:[
+            {startTime:{$gte:new Date(startTime),
+                $lt:new Date(endTime)
+            }},
+        {endTime:{$gt: new Date(startTime), $lte:new Date(endTime)}}  ,
+        {startTime:{$lte:new Date(startTime)},endTime:{$gte:new Date(endTime)}}
+        ]
+    });
+    if (overlap){
+        throw new BadRequestError("This slot is not avaialble for this resource")
+    }
+
     const reservation=await Reservation.create(req.body);
-    res.status(200).json({reservation});
+    res.status(StatusCodes.CREATED).json({reservation});
 };
 const deleteReservation=async (req,res)=>{
     const {
-        user:{userId},
+        user:{userId,role},
         params:{id:reservationId}}=req;
-        const reservation=await Reservation.findOneAndDelete({_id:reservationId,
-            userId})
+        let query={_id:reservationId};
+        if (role!='Admin'){
+            query.userId=userId
+        }
+        const reservation=await Reservation.findOneAndDelete({query});
 
-    if (!reservation){
-        return res.status(404).json({msg:"Reservation with the id doesn't exist"});
+
+    if (!reservation && !resource){
+        throw new BadRequestError("Reservations with the given Id doesn't exist");
     }
-    res.status(200).json({reservation});
+    res.status(StatusCodes.OK).json({msg:`Reservation successfully deleted by ${role}`,reservation});
 }
 module.exports={
     getAllReservation,

@@ -1,0 +1,4 @@
+This is the backend part of the project Reservation Management API which manages reservations of predefined resources such as rooms, halls , slots etc.
+It consists of two roles named Admin and User, with Admin having the complete access of all the resources whether to add, delete, update or create the resources along with every access available for users while Users can login/register and see their profile, they can only see the resources to decide whether to file reservations or not,.
+Users can see their reservations, create a new one or cancel their ow while Admin can see all the reservations and cancel someone else's as well.
+Users also can't create a reservation for a timeframe for which the resource is already booked.
