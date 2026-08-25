@@ -37,7 +37,7 @@ const reservationScehema=new mongoose.Schema({
             values:["Pending","Confirmed","Cancelled"],
             message:'{VALUE} is not a valid input for this'
         },
-        default:'confirmed'
+        default:'Confirmed'
     }
 },
 {

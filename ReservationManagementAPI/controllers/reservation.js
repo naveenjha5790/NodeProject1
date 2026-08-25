@@ -1,4 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
+const mongoose=require('mongoose')
 const Reservation=require('../models/reservation');
 const { BadRequestError, notFoundError } = require('../errors');
 const Resource = require('../models/Resource');
@@ -9,8 +10,8 @@ const notFound = require('../middleware/not-found');
 const getAllReservation=async (req,res)=>{
   const {userId,role}=req.user;
     let query={};
-    if (role!== 'Admin'){
-        query.userId=userId;
+    if (role.toLowerCase() !== 'admin') {
+        query.userId=new mongoose.Types.ObjectId(userId);
     }
     const reservation=await Reservation.find(query)
     .sort('-createdAt')
@@ -22,9 +23,10 @@ const getAllReservation=async (req,res)=>{
     });
 };
 const createReservation= async (req,res)=>{
-    req.body.userId=req.user.userId;
+    //req.body.userId=req.user.userId;
     const {resourceId}=req.params;
-    req.body.resourceId = resourceId; 
+    req.body.userId = new mongoose.Types.ObjectId(req.user.userId);
+        req.body.resourceId = new mongoose.Types.ObjectId(resourceId); 
     const exists=await Resource.findById(resourceId);
     if (!exists){
         throw new notFoundError("The resource with given id doesn't exist");

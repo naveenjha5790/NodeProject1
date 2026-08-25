@@ -9,9 +9,9 @@ const cricAllq= asyncWrap(async (req,res,next)=>{
   const {numericFilters,sort,fields,name,country,runs,batAvg,bowlAvg,highestScore,tests,wickets}=req.query;
   const queryObject={}
   if (name){
-    queryObject.name=name;
+    queryObject.name={ $regex: name, $options: 'i' };
   }if (country){
-    queryObject.country=country;
+    queryObject.country={ $regex: country, $options: 'i' };
   }if (runs){
     queryObject.runs=runs;
   }if (batAvg){
@@ -32,15 +32,14 @@ const cricAllq= asyncWrap(async (req,res,next)=>{
         '<=':'$lte',
         '=':'$eq',
     }
-    const regEx=/\b(<|>|<=|>=|=)\b/g;
-    let filters=numericFilters.replace(regEx,
-        (match)=>
-            `-${operatorMap[match]}-`);
+    
+    const regEx = /(<=|>=|<|>|=)/g;
+let filters = numericFilters.replace(regEx, (match) => `-${operatorMap[match]}-`);
         const options=['runs','batAvg','bowlAvg','tests','highestScore','wickets'];
-        filters=filters.split(',').forEach((item)=>{
+        filters.split(',').forEach((item)=>{
             const [field,operator,value]=item.split('-')
-            if (options.includes(field)){
-                queryObject[field]={ [operator]:Number(value)}
+            if (options.includes(field) && !isNaN(Number(value))){
+                queryObject[field]={ ...queryObject[field],[operator]:Number(value)}
 
             }
         });
@@ -59,29 +58,29 @@ const cricAllq= asyncWrap(async (req,res,next)=>{
         }
         const query1={...req.query};
         if (query1.id){
-            query1._id=query>id;
+            query1._id=query.id;
             delete query1._id;
         }
         if (query1.name ){
-            query1.name={
+            queryObject.name={
                 $regex:query1.name,
                 $options:'i'
             };
         }
         if (query1.country ){
-            query1.country={
+            queryObject.country={
                 $regex:query1.country,
                 $options:'i'
             };
         }
-        const cric=await work.find(query1);
-        res.status(200).json({cric,nbHits:cric.length})
+        //const cric=await work.find(query1);
+        //res.status(200).json({cric,nbHits:cric.length})
         const page=Number(req.query.page)||1;
-        const limit=Number(req.query.limit)||7;
+        const limit=Number(req.query.limit)||15;
         const skip=(page-1)*limit;
         result=result.skip(skip).limit(limit);
         const details=await result;
-        res.status(200).json({details,nbHits:details.length});
+        res.status(200).json({tasks:details,nbHits:details.length});
 })
     
 const addCricketers=asyncWrap(async (req,res,next)=>{

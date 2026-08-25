@@ -4,9 +4,11 @@ const resource=require('./routes/resource');
 const reservation=require('./routes/reservation');
 const {auth,authorizeRoles}=require('./middleware/authentication');
 const express=require('express');
+const cors=require('cors');
 const notFoundMiddleware=require('./middleware/not-found');
 const errorHandlerMiddleware=require('./middleware/error-handler');
 const app=express();
+app.use(cors());
 if (!globalThis.crypto) {
   globalThis.crypto = require('node:crypto').webcrypto;
 }

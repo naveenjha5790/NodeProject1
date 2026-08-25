@@ -7,11 +7,10 @@ const getAllResources=async (req,res)=>{
 }
 const getResource=async (req,res)=>{
     const {
-        user:{userId},
-        params:{id:resourceId}}=req
-    const resource=await Resource.findOne({_id:resourceId,
-        createdBy:userId
-    })
+        params: { id: resourceId }
+    } = req;
+
+    const resource=await Resource.findOne({_id:resourceId})
     if (!resource){
         throw new notFoundError("Resource with the id doesn't exist");
     }

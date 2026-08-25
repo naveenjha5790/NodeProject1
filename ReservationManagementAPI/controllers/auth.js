@@ -6,7 +6,10 @@ const {StatusCodes}=require('http-status-codes')
 const register=async (req,res)=>{
     const user=await User.create({...req.body});
     const token=user.createJWT();
-    res.status(StatusCodes.CREATED).json({user:{name:user.name},token});
+    res.status(StatusCodes.CREATED).json({user:
+        {name:user.name,
+            role:user.role},
+            token});
 }
 const login=async (req,res)=>{
     const {email,password}=req.body;
@@ -22,7 +25,10 @@ const login=async (req,res)=>{
         throw new Unauthenticatederror("Wrong password, please try again");
     }
     const token=user.createJWT();
-    res.status(StatusCodes.OK).json({user:{name:user.name},token})
+    res.status(StatusCodes.OK).json({user:
+        {name:user.name,
+            role:user.role
+        },token})
 };
 const profile=async (req,res)=>{
     const myProfile=await User.findById(req.user.userId).select('-password');
