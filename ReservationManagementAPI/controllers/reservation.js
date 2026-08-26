@@ -58,10 +58,10 @@ const deleteReservation=async (req,res)=>{
         if (role!='Admin'){
             query.userId=userId
         }
-        const reservation=await Reservation.findOneAndDelete({query});
+        const reservation=await Reservation.findOneAndDelete(query);
 
 
-    if (!reservation && !resource){
+    if (!reservation ){
         throw new BadRequestError("Reservations with the given Id doesn't exist");
     }
     res.status(StatusCodes.OK).json({msg:`Reservation successfully deleted by ${role}`,reservation});

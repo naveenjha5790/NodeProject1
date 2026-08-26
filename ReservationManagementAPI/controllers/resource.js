@@ -42,15 +42,15 @@ const updateResource=async (req,res)=>{
             return res.status(404).send("Name and type shouldn't be empty");
         }
         const resource=await Resource.findOneAndUpdate({
-            _id:resourceId,
-            createdBy:userId},
+            _id:resourceId},
+            {name, resourceType, capacity, location, pricePerUnit, pricingType, isActive},
             req.body,
             {
                 new:true,
                 runValidators:true
         })
         if (!resource){
-            throw notFoundError("Resource doesn't exist");
+            throw new notFoundError("Resource doesn't exist");
         }
         res.status(StatusCodes.CREATED).json({resource})
     }
