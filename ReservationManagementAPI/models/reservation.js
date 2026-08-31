@@ -4,12 +4,12 @@ const reservationScehema=new mongoose.Schema({
     userId:{
         type:mongoose.Schema.ObjectId,
         ref:'User',
-        require:[true,'please provide user id']
+        required:[true,'please provide user id']
     },
     resourceId:{
         type:mongoose.Schema.ObjectId,
         ref:'Resource',
-        require:[true,"A valid resourceId link path is mandatory to place reservations"]
+        required:[true,"A valid resourceId link path is mandatory to place reservations"]
     },
     startTime:{
         type:Date,
@@ -34,11 +34,17 @@ const reservationScehema=new mongoose.Schema({
     status:{
         type:String,
         enum:{
-            values:["Pending","Confirmed","Cancelled"],
+            values:["Pending","Confirmed","Cancelled","Admin Request Pending"],
             message:'{VALUE} is not a valid input for this'
         },
         default:'Confirmed'
     }
+,
+    notes:{
+        type: String,
+        trim: true,
+        default: ""
+    },
 },
 {
     timestamps:true

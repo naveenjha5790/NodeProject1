@@ -66,8 +66,30 @@ const deleteReservation=async (req,res)=>{
     }
     res.status(StatusCodes.OK).json({msg:`Reservation successfully deleted by ${role}`,reservation});
 }
+const approveReservationRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Locate target document asset and change status to confirmed
+        const updatedReservation = await Reservation.findByIdAndUpdate(
+            id,
+            { status: "Confirmed" },
+            { new: true } // Returns the modified document
+        );
+
+        if (!updatedReservation) {
+            return res.status(404).json({ message: "Reservation entry target not found" });
+        }
+
+        res.status(200).json({ msg: "Reservation successfully confirmed by Admin", updatedReservation });
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
+};
+
 module.exports={
     getAllReservation,
     createReservation,
-    deleteReservation
+    deleteReservation,
+    approveReservationRequest
 }
