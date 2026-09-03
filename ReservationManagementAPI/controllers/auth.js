@@ -14,7 +14,7 @@ const register=async (req,res)=>{
 const login=async (req,res)=>{
     const {email,password}=req.body;
     if (!email || !password){
-        throw new BadRequestError("Please provide email and password")
+        throw new BadRequestError("Please provide correct email and password")
     }
     const user=await User.findOne({email});
     if (!user){
@@ -31,6 +31,11 @@ const login=async (req,res)=>{
         },token})
 };
 const profile=async (req,res)=>{
+    const targetId = req.user?.userId || req.user?.id;
+    
+    if (!targetId) {
+        throw new UnauthenticatedError("Authentication session signature is missing.");
+    }
     const myProfile=await User.findById(req.user.userId).select('-password');
     if (!myProfile){
         throw new Unauthenticatederror("Please login first");

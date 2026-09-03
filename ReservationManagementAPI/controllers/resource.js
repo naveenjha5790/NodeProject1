@@ -23,10 +23,10 @@ const createResource=async (req,res)=>{
 }
 const deleteResource=async (req,res)=>{
     const {
-        user:{userId},
+     //   user:{userId},
         params:{id:resourceId}}=req
     const resource=await Resource.findOneAndDelete({_id:resourceId,
-        createdBy:userId
+    
     })
     if (!resource){
         throw new notFoundError("Resource not found");

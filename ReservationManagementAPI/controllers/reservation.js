@@ -44,7 +44,7 @@ const createReservation= async (req,res)=>{
         ]
     });
     if (overlap){
-        throw new BadRequestError("This slot is not avaialble for this resource")
+        throw new BadRequestError("The start time must be before end time")
     }
 
     const reservation=await Reservation.create(req.body);
@@ -74,7 +74,7 @@ const approveReservationRequest = async (req, res) => {
         const updatedReservation = await Reservation.findByIdAndUpdate(
             id,
             { status: "Confirmed" },
-            { new: true } // Returns the modified document
+            { new: true } 
         );
 
         if (!updatedReservation) {

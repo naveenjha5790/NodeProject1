@@ -34,7 +34,7 @@ const reservationScehema=new mongoose.Schema({
     status:{
         type:String,
         enum:{
-            values:["Pending","Confirmed","Cancelled","Admin Request Pending"],
+            values:["Confirmed","Cancelled","Pending","Admin Request Pending"],
             message:'{VALUE} is not a valid input for this'
         },
         default:'Confirmed'
